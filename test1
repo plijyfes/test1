@@ -1,0 +1,13 @@
+from urllib.request import urlopen
+
+from bs4 import BeautifulSoup
+
+quote_page = "http://pad.skyozora.com/pets/2259"
+page = urlopen(quote_page)
+soup = BeautifulSoup(page, 'html.parser')
+picture = soup.find('div', attrs={'style': 'position: relative; text-align:center; padding:0px; margin:0px; border:0px;'}).find('img').get('src')
+
+from urllib.request import urlretrieve
+
+file_name = 'pad1.png'
+urlretrieve(picture, file_name)
