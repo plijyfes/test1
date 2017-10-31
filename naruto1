@@ -1,0 +1,33 @@
+from urllib.request import urlopen
+
+from bs4 import BeautifulSoup
+
+from urllib.request import urlretrieve
+in_page = True
+page_number = 102900011093001
+pic_id = 102900011093002
+file_number = 1
+
+def download():
+    global in_page,page_number,pic_id,file_number
+    file_name = 'naruto_ch.1_page' + str(file_number) + '.jpg'
+    quote_page = "http://www.cartoonmad.com/comic/" + str(page_number) + ".html"
+    page = urlopen(quote_page)
+    soup = BeautifulSoup(page, 'html.parser')
+    picture_id = soup.find('a', attrs={'href': str(pic_id) + '.html'})
+
+    if picture_id == None:
+        in_page = False
+    else:
+        picture = picture_id.find('img').get('src')
+        urlretrieve(picture, file_name)
+        page_number += 1
+        pic_id += 1
+        file_number += 1
+
+def check():
+    global in_page, page_number, pic_id, file_number
+    while in_page == True:
+        download()
+
+check()
