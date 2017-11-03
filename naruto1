@@ -3,21 +3,36 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 
 from urllib.request import urlretrieve
+
+import os
+
 in_page = True
-page_number = 102900011093001
-pic_id = 102900011093002
+page_number = 102900021102001
+pic_id = page_number + 1
 file_number = 1
+curDir = os.getcwd()
+newfile = 'naruto_ch.2'
+os.mkdir(newfile)
+os.chdir(newfile)
 
 def download():
-    global in_page,page_number,pic_id,file_number
+    global in_page,page_number,pic_id,file_number,newfile
     file_name = 'naruto_ch.1_page' + str(file_number) + '.jpg'
     quote_page = "http://www.cartoonmad.com/comic/" + str(page_number) + ".html"
     page = urlopen(quote_page)
     soup = BeautifulSoup(page, 'html.parser')
     picture_id = soup.find('a', attrs={'href': str(pic_id) + '.html'})
+    page_len = len(soup.find_all('option')) - 1
 
-    if picture_id == None:
+    if file_number > page_len:
         in_page = False
+    elif file_number == page_len:
+        picture_id = soup.find('a', attrs={'href': 'thend.asp'})
+        picture = picture_id.find('img').get('src')
+        urlretrieve(picture, file_name)
+        page_number += 1
+        pic_id += 1
+        file_number += 1
     else:
         picture = picture_id.find('img').get('src')
         urlretrieve(picture, file_name)
@@ -26,7 +41,7 @@ def download():
         file_number += 1
 
 def check():
-    global in_page, page_number, pic_id, file_number
+    global in_page
     while in_page == True:
         download()
 
