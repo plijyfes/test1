@@ -6,43 +6,41 @@ from urllib.request import urlretrieve
 
 import os
 
-in_page = True
-page_number = 102900021102001
-pic_id = page_number + 1
+url = ""
+folder_name = ""
 file_number = 1
-curDir = os.getcwd()
-newfile = 'naruto_ch.2'
-os.mkdir(newfile)
-os.chdir(newfile)
 
 def download():
-    global in_page,page_number,pic_id,file_number,newfile
-    file_name = 'naruto_ch.1_page' + str(file_number) + '.jpg'
-    quote_page = "http://www.cartoonmad.com/comic/" + str(page_number) + ".html"
-    page = urlopen(quote_page)
-    soup = BeautifulSoup(page, 'html.parser')
-    picture_id = soup.find('a', attrs={'href': str(pic_id) + '.html'})
-    page_len = len(soup.find_all('option')) - 1
+    global folder_name,file_number,url
+    page = urlopen(url)
+    soup = BeautifulSoup(page, "html.parser")
+    pages = soup.find("select", attrs={"name": "jump"}).find_all("option")
+    os.mkdir(folder_name)
+    os.chdir(folder_name)
+    for n in pages:
+        if n.get("value") != None:
+            # print(n)
+            # print(n.get("value"))
+            url = "http://www.cartoonmad.com/comic/" + n.get("value")
+            page = urlopen(url)
+            soup = BeautifulSoup(page, 'html.parser')
+            file_name = folder_name + 'page' + str(file_number) + '.jpg'
+            picture = soup.find("img", attrs={"border": "0", "oncontextmenu": "return false"}).get("src")
+            # print(picture)
+            # print(file_name)
+            urlretrieve(picture, file_name)
+            file_number += 1
 
-    if file_number > page_len:
-        in_page = False
-    elif file_number == page_len:
-        picture_id = soup.find('a', attrs={'href': 'thend.asp'})
-        picture = picture_id.find('img').get('src')
-        urlretrieve(picture, file_name)
-        page_number += 1
-        pic_id += 1
-        file_number += 1
-    else:
-        picture = picture_id.find('img').get('src')
-        urlretrieve(picture, file_name)
-        page_number += 1
-        pic_id += 1
-        file_number += 1
-
-def check():
-    global in_page
-    while in_page == True:
+def ask():
+    global url,folder_name
+    url = input("Please enter the URL: ")
+    #print(url)
+    folder_name = input("Please enter new folder name: ")
+    #print(folder_name)
+    if input("Start download?[Y/N]: ") == 'Y':
+        print("Please wait")
         download()
+    else:
+        print("End")
 
-check()
+ask()
